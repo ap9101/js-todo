@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>to do </title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="space-y-0 bg-no-repeat bg-cover bg-[url('E:\js\todo\pexels-eberhardgross-691668.jpg')] ">
+
+    <div class="w-full ">
+        <h1
+            class="font-bold text-center  text-3xl  text-[#ffffff]  bg-gradient-to-t from-[#a270ff] via-[#1ef86e] to-[#ff0000] ">
+            TO DO APP</h1>
+    </div>
+    <div class="w-full h-full">
+
+        <h1 class=" text-center  text-[#000] bg-[#7b836a] py-4 font-bold text-xl ">MY Notes </h1>
+
+
+
+
+
+        <div class="items-center col-auto grid grid-cols-4 justify-center self-center w-full   h-full" id="list">
+
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+
+        <div id="pagebuttons" class=" w-full fixed bottom-0 items-center text-center space-x-2">
+
+
+        </div>
+        <span class="absolute bottom-2 right-8">
+            <button id="openPopupBtn" class="fixed right-1 bottom-3 col-auto    bg-opacity-10  rounded-full mx-auto "><i
+                    class="fab fa-add text-[#fff] text-2xl font-semibold bg-gradient-to-r from-[#4bb3e7] to-[#2b2b83]  px-8 py-8 rounded-full  "></i></button>
+        </span>
+
+
+    </div>
+
+
+
+    <div id="popup" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center hidden">
+        <div class="bg-white rounded-lg  w-1/2 py-10 relative">
+            <span id="closePopupBtn"
+                class="absolute top-2 right-2 text-gray-600 hover:text-black cursor-pointer text-2xl">&times;</span>
+
+            <h1 class="font-bold text-2xl text-center underline">Add Your To Do</h1>
+            <br>
+            <br>
+
+
+            <div class="w-full grid justify-center  gap-x-8" id="form">
+                <span class="flex text-lg items-center ">Title :
+                    <input type="text" id="title" class="border ml-4 p-2  shadow bg-[#F6F6F6] rounded-lg mx-4 "
+                        placeholder=" ADD TITLE">
+                </span>
+                <span class="titlefill text-red-500 mx-auto"></span>
+                <br>
+                <hr>
+                <br>
+                <span class=" flex text-lg">
+                    To-Do : <textarea name="" id="todo"
+                        class="p-2 text-lg border ml-4 bg-[#F6F6F6] rounded shadow mx-4"></textarea>
+                    <i class="fa fa-info relative has-tooltip  rounded-full px-2 py-1">
+                        <span class='tooltip rounded shadow-lg p-1 bg-gray-100 text-red-500 -mt-8 text-xs'>Must Be 4
+                            Words</span>
+                    </i>
+
+                </span>
+                <span class="todofill text-red-500 mx-auto"></span>
+                <br>
+                <span class="flex text-lg items-center ">BG Color : <input type="color" id="bgcolor"></span>
+                <br>
+                <span class="flex text-lg items-center ">Text Color : <input type="color" id="txtcolor"></span>
+                <br>
+                <span class="colorfill text-red-500 mx-auto"></span>
+                <br>
+                <div class="alert text-red-500"></div>
+                <button
+                    class="border shadow-md bg-[#2e6988] text-[#ffffff]  mt-10 mx-auto p-2 px-2 py-2 rounded-lg font-bold"
+                    id="submit">submit</button>
+
+
+
+            </div>
+
+        </div>
+    </div>
+    <!-- eye popup -->
+    <div id="seepop">
+
+    </div>
+    <div id="editnote">
+
+    </div>
+    </div>
+
+</body>
+<script>
+    var valuesArray = [];
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        if (localStorage.getItem('todoData')) {
+            valuesArray = JSON.parse(localStorage.getItem('todoData'));
+            init(valuesArray);
+        }
+        const openPopupBtn = document.getElementById('openPopupBtn');
+        const popup = document.getElementById('popup');
+
+        const closePopupBtn = document.getElementById('closePopupBtn');
+        const submitbtn = document.getElementById('submit')
+
+        let Array = []
+
+
+
+        openPopupBtn.addEventListener('click', function () {
+
+            popup.style.display = 'flex'
+        });
+
+        closePopupBtn.addEventListener('click', function () {
+            popup.style.display = 'none'
+        });
+
+
+        window.addEventListener('click', (e) => {
+            if (e.target === popup) {
+                popup.style.display = 'none'
+            }
+        });
+
+
+
+        submitbtn.addEventListener('click', function (e) {
+            // e.preventDefault();
+
+            let title = document.getElementById('title').value;
+
+            console.log(title);
+
+
+            let todo = document.getElementById('todo').value;
+            console.log(todo);
+
+
+
+            let txtcolor = document.getElementById('txtcolor').value;
+            console.log(txtcolor);
+            let bgcolor = document.getElementById('bgcolor').value;
+            console.log(bgcolor);
+            if (validation(title, todo, bgcolor, txtcolor)) {
+                const now = new Date();
+                var Time = now.toLocaleString();
+                let createdat = now.toLocaleString();
+                console.log("Current Date and Time:", Time);
+
+                valuesArray.unshift({ title: title[0].toUpperCase() + title.slice(1), todo: todo, Time: Time, txtcolor: txtcolor, bgcolor: bgcolor, createdat: createdat });
+
+                localStorage.setItem('todoData', JSON.stringify(valuesArray));
+
+
+                document.getElementById('popup').style.display = 'none';
+
+                console.log('Values Array:', valuesArray);
+
+
+                init(valuesArray);
+
+
+                document.getElementById('title').value = '';
+                document.getElementById('todo').value = '';
+                document.getElementById('txtcolor').value = '';
+                document.getElementById('bgcolor').value = '';
+            }
+
+        });
+    })
+
+
+    function setInnerHTMLForClass(className, message) {
+        let elements = document.getElementsByClassName(className);
+        for (let elem of elements) {
+            elem.innerHTML = message;
+        }
+    }
+
+    function validation(title, todo, bgcolor, txtcolor) {
+
+
+        // Clear previous error messages
+        setInnerHTMLForClass('titlefill', '');
+        setInnerHTMLForClass('todofill', '');
+        setInnerHTMLForClass('alert', '');
+        setInnerHTMLForClass('colorfill', '');
+
+        // Validation checks
+        if (!title) {
+            setInnerHTMLForClass('titlefill', '*Title Must Be Filled');
+            return false;
+        }
+
+        if (todo.trim().split(' ').length < 4) {
+            setInnerHTMLForClass('todofill', '*To-Do Must Have 4 Words');
+            return false;
+        }
+
+        if (!title || !todo || !bgcolor || !txtcolor) {
+            setInnerHTMLForClass('alert', '*All Input Must Be Filled');
+            return false;
+        }
+
+        if (bgcolor === txtcolor) {
+            setInnerHTMLForClass('colorfill', '*BgColor And TextColor Must Be Different');
+            return false;
+        }
+
+
+        return true;
+    }
+
+    function init(data) {
+
+        let currentpage = localStorage.getItem('currentpage');
+
+
+        const itemsPerPage = 5;
+        const totalPages = Math.ceil(data.length / itemsPerPage);
+
+        console.log("Total pages:", totalPages);
+
+        let buttons = '';
+        for (let i = 0; i < totalPages; i++) {
+            buttons += `<button id="pageBtn${i}" class="  text-black bg-white px-1  active:bg-[#000] active:text-[#fff]" px-1" onclick="render(${i})">${i + 1}</button>`;
+        }
+        document.getElementById('pagebuttons').innerHTML = buttons;
+
+
+
+
+
+        // Initialize the first page
+        render(currentpage ? currentpage : 0)
+    }
+
+    function render(index) {
+        localStorage.setItem('currentpage', index);
+        const itemsPerPage = 5;
+        let list = '';
+        const start = index * itemsPerPage;
+        const end = Math.min(start + itemsPerPage, valuesArray.length);
+
+        for (let i = start; i < end; i++) {
+            list += `<div class="relative dropdown m-8 h-48 mx-16 shadow overflow-hidden rounded" style="background-color: ${valuesArray[i].bgcolor}; color: ${valuesArray[i].txtcolor};">
+                    <div class="dropdown-content hidden w-full h-full space-x-8 items-center text-center bg-black bg-opacity-25">
+                        <button id="delete${i}" onclick="del(${i})">
+                            <i class="fa fa-trash has-tooltip text-3xl hover:text-[#fff]">
+                            <span class='tooltip rounded shadow-lg p-1 text-white mt-8 text-xs'>delete</span>
+                        </i></button>
+                        <button id="see${i}" onclick="view(${i})"><i class="fa fa-eye has-tooltip text-3xl hover:text-[#fff]">
+                            <span class='tooltip rounded shadow-lg p-1 text-white mt-8 text-xs'>see</span>
+                        </i></button>
+                        <button id="edit${i}" onclick="editnote(${i})"><i class="fa fa-pen has-tooltip text-3xl mt-20 hover:text-[#fff]">
+                            <span class='tooltip rounded shadow-lg p-1 text-white mt-8 text-xs'>edit</span>
+                        </i></button>
+                    </div>
+                    <h1 class="mt-2 font-medium text-xl text-center">${valuesArray[i].title}</h1>
+                    <p class="my-4 mx-2">${valuesArray[i].todo}</p>
+                    <p class="absolute bottom-1 right-1 text-xs" id="time">${valuesArray[i].Time}</p>
+                    
+                </div>`;
+        }
+
+        document.getElementById('list').innerHTML = list;
+        console.log(list);
+
+    }
+
+
+
+    function del(index) {
+        console.log("before", valuesArray)
+        valuesArray = valuesArray.filter((_, i) => i !== index);
+        init(valuesArray);
+        console.log("after", valuesArray);
+
+        localStorage.setItem('todoData', JSON.stringify(valuesArray));
+    };
+
+
+    function view(index) {
+        var see = "";
+        let i = index;
+        see += ` <div id="eyepop" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center h-full w-full ">
+            <div class=" rounded-lg h-1/2 w-1/2 py-10 mx-auto relative my-40 " style="background-color: ${valuesArray[i].bgcolor}; color: ${valuesArray[i].txtcolor};">
+                <button onclick="closePopup(${i})"
+                    class="absolute top-2 right-2 text-gray-600 hover:text-black cursor-pointer text-2xl">&times;</button>
+                <h1 class="text-center text-3xl underline font-bold">${valuesArray[i].title}</h1>
+                <br>
+                <hr>
+                <br>
+                <p class="text-center text-xl ">${valuesArray[i].todo}</p>
+                <p class="absolute bottom-1 right-4 text-sm ">Last Saved:${valuesArray[i].Time} </p>
+                  <p class="absolute bottom-1 left-2 text-sm ">Created At:${valuesArray[i].createdat} </p>
+
+
+            </div>
+
+        </div>`
+        document.getElementById('seepop').innerHTML = see
+
+
+        console.log(list)
+    }
+
+    function closePopup(index) {
+        let i = index;
+        document.getElementById('seepop').innerHTML = ''
+    }
+
+
+
+    function editnote(index) {
+        let i = index;
+        let edit = `
+        <div id="editpop" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg w-1/2 py-10 relative mx-auto my-40">
+                <span onclick="editclosbtn()" class="absolute top-2 right-2 text-gray-600 hover:text-black cursor-pointer text-2xl">&times;</span>
+                <h1 class="font-bold text-2xl text-center underline">Edit Your To Do</h1>
+                <br>
+                <br>
+                <div class="w-full grid justify-center gap-x-8" id="form">
+                    <span class="flex text-lg items-center">Title: 
+                        <input type="text" id="titleedited" class="border ml-4 p-2 shadow bg-[#F6F6F6] rounded-lg mx-4" placeholder="ADD TITLE" value="${valuesArray[i].title}">
+                       
+                    </span>
+                     <span class="titlefill text-red-500 mx-auto" ></span>
+                    <br>
+                    <hr>
+                    <br>
+                    <span class="flex text-lg">To-Do: 
+                        <textarea id="todoedited" class="p-2 text-lg border ml-4 bg-[#F6F6F6] rounded shadow mx-4">${valuesArray[i].todo}</textarea>
+                         <i class="fa fa-info has-tooltip  rounded-full px-2 py-1">
+                            <span class='tooltip rounded shadow-lg p-1 bg-gray-100 text-red-500 -mt-8 text-xs'>must be 4 words</span>
+                        </i>
+                    </span>
+                     <span class="todofill text-red-500 mx-auto" ></span>
+                    <br>
+                    <span class="flex text-lg items-center">BG Color: 
+                        <input type="color" id="bgcoloredited" value="${valuesArray[i].bgcolor}">
+                    </span>
+                    <br>
+                    <span class="flex text-lg items-center">Text Color: 
+                        <input type="color" id="txtcoloredited" value="${valuesArray[i].txtcolor}">
+                    </span>
+                    <span class="colorfill text-red-500 mx-auto"></span>
+                    <div class="alert text-red-500" ></div>
+                    <button class="border shadow-md bg-[#2e6988] text-[#ffffff] mt-10 mx-auto p-2 px-2 py-2 rounded-lg font-bold" onclick="update(${i})">Submit</button>
+                </div>
+            </div>
+        </div>`;
+        document.getElementById('editnote').innerHTML = edit;
+
+    }
+
+    function editclosbtn() {
+        document.getElementById('editnote').innerHTML = '';
+    }
+
+    function update(index) {
+        let i = index;
+        let newtitle = document.getElementById('titleedited').value;
+        let newtodo = document.getElementById('todoedited').value;
+        let newbgColor = document.getElementById('bgcoloredited').value;
+        let newtxtColor = document.getElementById('txtcoloredited').value;
+        const todowords = newtodo.trim().split(/\s+/).length;
+        const now = new Date();
+
+
+        const editTime = now.toLocaleString();
+        console.log("Current Date and Time:", editTime);
+        if (validation(newtitle, newtodo, newbgColor, newtxtColor)) {
+
+            valuesArray[i].title = newtitle[0].toUpperCase() + newtitle.slice(1);
+            valuesArray[i].todo = newtodo;
+            valuesArray[i].bgcolor = newbgColor;
+            valuesArray[i].txtcolor = newtxtColor;
+            valuesArray[i].Time = '<br>' + 'Last Edited ' + editTime
+            console.log(valuesArray)
+
+            localStorage.setItem('todoData', JSON.stringify(valuesArray));
+            init(valuesArray);
+            editTime - ''
+            editclosbtn();
+        }
+        // if (todowords < 4) {
+        //     document.getElementById('todoeditfill').innerHTML = '*To-Do Must Have 4 Words'
+
+        // } else {
+        //     document.getElementById('todoeditfill').innerHTML = ''
+        //     if (!newtitle) {
+        //         document.getElementById('titleeditfill').innerHTML = '*Title Must Be Filled'
+        //     }
+        //     else {
+        //         document.getElementById('titleeditfill').innerHTML = '';
+        //         if (!newtitle || !newtodo || !newbgColor || !newtxtColor) {
+        //             document.getElementById('alertedit').innerHTML = '*All Input Must Be Filled';
+
+
+        //         } else {
+        //            
+        //         }
+        //     }
+        // }
+
+
+
+
+
+    }
+
+
+
+
+</script>
+
+</html>
